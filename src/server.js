@@ -4,43 +4,45 @@ const PORT = 4000;
 
 const app = express();
 
-const logger = (req, res, next) => {
-  console.log(`${req.method} ${req.url}`);
+const urlLogger = (req, res, next) => {
+  console.log(`Path: ${req.url}`);
   next();
 };
-const privateMiddleware = (req, res, next) => {
-  const url = req.url;
-  if (url === "/protected") {
-    return res.send("<h1>Not Allowed</h1>");
+
+const timeLogger = (req, res, next) => {
+  const today = new Date();
+  console.log(
+    `Time: ${today.getFullYear()}. ${today.getMonth() + 1}. ${today.getDate()}`
+  );
+  next();
+};
+
+const securityLogger = (req, res, next) => {
+  console.log(req.protocol);
+  if (req.protocol === "https") {
+    console.log("secure");
+  } else {
+    console.log("insecure");
   }
   next();
 };
 
 const handleHome = (req, res) => {
-  return res.send("hi");
-};
-const handleProtected = (req, res) => {
-  return res.send("Welcome to the private lounge");
+  return res.send("<h1>Have a nice day!</h1>");
 };
 
-const handleAbout = (req, res) => {
-  return res.send("about here");
-};
-const handleContact = (req, res) => {
-  res.send("I miss you");
-};
-const handleLogin = (req, res) => {
-  res.send("login");
+const protectedLogger = (req, res) => {
+  const url = req.url;
+  if (url === "/protected") {
+    return res.send("<h1>Not Allowed</h1>");
+  }
 };
 
-app.use(logger);
-app.use(privateMiddleware);
+app.use(urlLogger);
+app.use(timeLogger);
+app.use(securityLogger);
 app.get("/", handleHome);
-app.get("/protected", handleProtected);
-
-app.get("/about", handleAbout);
-app.get("/contact", handleContact);
-app.get("/login", handleLogin);
+app.get("/protected", protectedLogger);
 
 const handleListening = () =>
   console.log(`server listening on port 4000 http://localhost:${PORT}`);
