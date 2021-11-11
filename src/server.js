@@ -1,4 +1,5 @@
 import express from "express";
+import logger from "morgan";
 
 const PORT = 4000;
 
@@ -18,7 +19,6 @@ const timeLogger = (req, res, next) => {
 };
 
 const securityLogger = (req, res, next) => {
-  console.log(req.protocol);
   if (req.protocol === "https") {
     console.log("secure");
   } else {
@@ -28,7 +28,7 @@ const securityLogger = (req, res, next) => {
 };
 
 const handleHome = (req, res) => {
-  return res.send("<h1>Have a nice day!</h1>");
+  return res.send("<h2>Have a nice day!</h2>");
 };
 
 const protectedLogger = (req, res) => {
@@ -38,6 +38,9 @@ const protectedLogger = (req, res) => {
   }
 };
 
+const morganLogger = logger("dev");
+
+app.use(morganLogger);
 app.use(urlLogger);
 app.use(timeLogger);
 app.use(securityLogger);
