@@ -4,6 +4,9 @@ html(lang="ko")
         title #{pageTitle} | Wetube
         include partials/head.pug
     body 
-        block content
+        header 
+            h2 #{pageTitle}        
+        main
+            block content
     
     include partials/footer.pug
