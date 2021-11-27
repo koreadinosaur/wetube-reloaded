@@ -25,7 +25,25 @@ export const postEdit = (req, res) => {
   console.log(req.body);
   return res.redirect();
 };
-export const upload = (req, res) => res.send("upload video");
+export const getUpload = (req, res) => {
+  return res.render("upload", { pageTitle: `upload Video` });
+};
+export const postUpload = (req, res) => {
+  const { title, description, hashtags } = req.body;
+  const Video = new video({
+    title,
+    description,
+    createdAt: Date.now(),
+    hashtags: hashtags.split(",").map((word) => `#${word}`),
+    meta: {
+      views: 0,
+      rating: 0,
+    },
+  });
+  console.log(Video);
+  return res.redirect("/");
+};
+
 export const deleteVideo = (req, res) => {
   console.log(req.params);
   res.send("delete video");
