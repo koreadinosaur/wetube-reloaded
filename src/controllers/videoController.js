@@ -3,7 +3,7 @@ import video from "../models/video";
 //globalRouter
 export const home = async (req, res) => {
   const videos = await video.find({});
-  return res.render("home", { pageTitle: "Home", videos: [] });
+  return res.render("home", { pageTitle: "Home", videos });
 };
 export const search = (req, res) => res.send("search");
 
@@ -28,7 +28,7 @@ export const postEdit = (req, res) => {
 export const getUpload = (req, res) => {
   return res.render("upload", { pageTitle: `upload Video` });
 };
-export const postUpload = (req, res) => {
+export const postUpload = async (req, res) => {
   const { title, description, hashtags } = req.body;
   const Video = new video({
     title,
@@ -40,7 +40,7 @@ export const postUpload = (req, res) => {
       rating: 0,
     },
   });
-  console.log(Video);
+  await Video.save();
   return res.redirect("/");
 };
 
