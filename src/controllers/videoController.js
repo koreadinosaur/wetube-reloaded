@@ -2,8 +2,8 @@ import video from "../models/video";
 
 //globalRouter
 export const home = async (req, res) => {
-  const videos = await video.find({});
-  return res.render("home", { pageTitle: "Home", videos });
+  const videos = await video.find({}); //모든 video를 찾아냄 videos는 video들로 구성된 array다.
+  return res.render("home", { pageTitle: "Home", videos }); //videos를 Home 템플릿으로 전송
 };
 export const search = (req, res) => res.send("search");
 
@@ -30,18 +30,19 @@ export const getUpload = (req, res) => {
 };
 export const postUpload = async (req, res) => {
   const { title, description, hashtags } = req.body;
-  const Video = new video({
-    title,
-    description,
-    createdAt: Date.now(),
-    hashtags: hashtags.split(",").map((word) => `#${word}`),
-    meta: {
-      views: 0,
-      rating: 0,
-    },
-  });
-  await Video.save();
-  return res.redirect("/");
+  try {
+    await video.create({
+      title,
+      description,
+      hashtags: hashtags.split(",").map((word) => `#${word}`),
+    });
+    return res.redirect("/");
+  } catch (error) {
+    return res.render("upload", {
+      pageTitle: `upload Video`,
+      errorMessage: error._message,
+    });
+  }
 };
 
 export const deleteVideo = (req, res) => {
