@@ -2,10 +2,21 @@ import video from "../models/video"; //video는 model, 후술할 Video는 objcet
 
 //globalRouter
 export const home = async (req, res) => {
-  const videos = await video.find({}); //모든 video를 찾아냄 videos는 video들로 구성된 array다.
+  const videos = await video.find({}).sort({ createdAt: "asc" }); //모든 video를 찾아냄 videos는 video들로 구성된 array다.
   return res.render("home", { pageTitle: "Home", videos }); //videos를 Home 템플릿으로 전송
 };
-export const search = (req, res) => res.send("search");
+export const search = async (req, res) => {
+  const { keyword } = req.query;
+  let videos = [];
+  if (keyword) {
+    videos = await video.find({
+      title: {
+        $regex: new RegExp(keyword, "i"),
+      },
+    });
+  }
+  return res.render("search", { pageTitle: "Search", videos });
+};
 
 //videoRouter
 export const watch = async (req, res) => {
@@ -65,7 +76,8 @@ export const postUpload = async (req, res) => {
   }
 };
 
-export const deleteVideo = (req, res) => {
-  console.log(req.params);
-  res.send("delete video");
+export const deleteVideo = async (req, res) => {
+  const { id } = req.params;
+  await video.findByIdAndDelete(id);
+  return res.redirect("/");
 };
