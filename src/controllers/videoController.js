@@ -26,7 +26,7 @@ export const watch = async (req, res) => {
   // exec()를 입력할 필요는 없다. 입력해도 똑같이 작동함.
   if (Video === null) {
     //Video === null은 !Video와 같다.
-    return res.render("404", { pageTitle: "Video not found" });
+    return res.status(404).render("404", { pageTitle: "Video not found" });
   } else {
     return res.render("watch", { pageTitle: Video.title, video: Video }); //video: video가 같은 이름이면 video만 입력해도 됨.
   }
@@ -69,7 +69,7 @@ export const postUpload = async (req, res) => {
     });
     return res.redirect("/");
   } catch (error) {
-    return res.render("upload", {
+    return res.status(400).render("upload", {
       pageTitle: `upload Video`,
       errorMessage: error._message,
     });
