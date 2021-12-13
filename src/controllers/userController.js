@@ -1,9 +1,12 @@
 import User from "../models/User";
+import bcrypt from "bcrypt";
+import req from "express/lib/request";
+
 //globalRouter
 export const getJoin = (req, res) => res.render("join", { pageTitle: "Join" });
 export const postJoin = async (req, res) => {
-  const { email, username, password1, password2, name, location } = req.body;
-  if (password1 !== password2) {
+  const { email, username, password, password2, name, location } = req.body;
+  if (password !== password2) {
     return res.status(400).render("join", {
       pageTitle: "Join",
       errorMessage: "password confirmation does not match.",
@@ -27,7 +30,7 @@ export const postJoin = async (req, res) => {
   } catch (error) {
     return res.status(400).render("join", {
       pageTitle: "Join",
-      errorMessage: error_message,
+      errorMessage: error._message,
     });
   }
 
@@ -37,7 +40,7 @@ export const getLogin = (req, res) =>
   res.render("login", { pageTitle: "Login" });
 
 export const postLogin = async (req, res) => {
-  const { username, password1 } = req.body;
+  const { username, password } = req.body;
   const user = await User.findOne({ username });
   if (!user) {
     return res.status(400).render("login", {
@@ -47,8 +50,16 @@ export const postLogin = async (req, res) => {
   }
   // check if account exists
   // check if password correct
-  console.log(user.password);
-  res.end();
+  const match = await bcrypt.compare(password, user.password);
+  if (!match) {
+    return res.status(400).render("login", {
+      pageTitle: "Login",
+      errorMessage: "password is not right",
+    });
+  }
+  req.session.loggedIn = true;
+  req.session.user = user;
+  return res.redirect("/");
 };
 
 //userRouter
