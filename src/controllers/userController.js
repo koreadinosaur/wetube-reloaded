@@ -42,7 +42,7 @@ export const getLogin = (req, res) =>
 
 export const postLogin = async (req, res) => {
   const { username, password } = req.body;
-  const user = await User.findOne({ username });
+  const user = await User.findOne({ username, socialOnly: false });
   if (!user) {
     return res.status(400).render("login", {
       pageTitle: "Login",
@@ -115,21 +115,21 @@ export const finishGithubLogin = async (req, res) => {
     if (!emailObj) {
       return res.redirect("/login");
     }
-    const existingUser = await User.findOne({ email: emailObj.email });
-    if (existingUser) {
-      req.session.loggedIn = true;
-      req.session.user = existingUser;
-      return res.redirect("/");
-    } else {
+    let user = await User.findOne({ email: emailObj.email });
+    if (!user) {
       const user = await User.create({
+        avatarUrl: userData.avatar_url,
         email: emailObj.email,
         username: userData.login,
         password: "",
         name: userData.name,
-        socialOnly: true,
+        socialOnly: true, //social login만 가능하다는 의미
         location: userData.location,
       });
     }
+    req.session.loggedIn = true;
+    req.session.user = user;
+    return res.redirect("/");
   } else {
     return res.redirect("/login");
   }
@@ -137,6 +137,8 @@ export const finishGithubLogin = async (req, res) => {
 
 //userRouter
 export const handleEditUser = (req, res) => res.send("Edit user");
-export const handleDelete = (req, res) => res.send("Delete User");
-export const logout = (req, res) => res.send("logout");
+export const logout = (req, res) => {
+  req.session.destroy();
+  return res.redirect("/");
+};
 export const see = (req, res) => res.send("see");
