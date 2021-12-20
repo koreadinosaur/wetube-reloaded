@@ -136,7 +136,48 @@ export const finishGithubLogin = async (req, res) => {
 };
 
 //userRouter
-export const handleEditUser = (req, res) => res.send("Edit user");
+export const getEdit = (req, res) => {
+  return res.render("edit-profile", { pageTitle: "Edit Profile" });
+};
+export const postEdit = async (req, res) => {
+  const {
+    session: {
+      user: { _id },
+    }, // const i = req.session.user.id 와 같음.
+    body: { email, username, name, location }, // const { email, username, name, location } = req.body;와 같음
+  } = req;
+  const exists = await User.exists({
+    _id: { $ne: { _id } },
+    $or: [{ username }, { email }],
+  });
+  if (exists) {
+    return res.status(400).render("edit-profile", {
+      pageTitle: "Edit Profile",
+      errorMessage: "This username or email is aleady taken.",
+    });
+  }
+  const updatedUser = await User.findByIdAndUpdate(
+    _id,
+    {
+      //현재 로그인된 user의 id는 request object에서 얻을 수 있다.
+      //email 등의 변수는 form에서 가져오는 것이다.
+      email,
+      username,
+      name,
+      location,
+    },
+    { new: true }
+  );
+  req.session.user = updatedUser;
+  // req.session.user = {
+  //   ...req.session.user, // req.session.user 내의 내용을 밖으로 꺼내줌 밑에 나열된 변수 제외하고는 변경할 게 없다는 의미.
+  //   email,
+  //   username,
+  //   name,
+  //   location,
+  // };
+  return res.redirect("/users/edit");
+};
 export const logout = (req, res) => {
   req.session.destroy();
   return res.redirect("/");
