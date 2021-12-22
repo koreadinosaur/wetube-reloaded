@@ -178,6 +178,41 @@ export const postEdit = async (req, res) => {
   // };
   return res.redirect("/users/edit");
 };
+export const getChangePassword = (req, res) => {
+  if (req.session.user.socialOnly === true) {
+    return res.redirect("/");
+  }
+  return res.render("change-password", { pageTitle: "Change Password" });
+};
+
+export const postChangePassword = async (req, res) => {
+  const {
+    session: {
+      user: { _id, password },
+    },
+    body: { currentPassword, newPassword, passwordConfirmation },
+  } = req;
+  const match = await bcrypt.compare(currentPassword, password); //앞에거는 form의 비밀번호, 뒤에는 로그인된 사용자의 password
+  if (!match) {
+    return res.status(400).render("change-password", {
+      pageTitle: "Change Password",
+      errorMessage: "the current password is not right",
+    });
+  }
+
+  if (newPassword !== passwordConfirmation) {
+    return res.status(400).render("change-password", {
+      pageTitle: "change password",
+      errorMessage: "New password do not match the confirmation",
+    });
+  }
+  const user = await User.findById(_id); // save 쓰려면 user를 정의해줘야함.
+  user.password = newPassword;
+  await user.save(); //promise일지도 모르니 await 선언. pre save middleware를 작동시킨다. 새로운 비밀번호를 hash하기 위함.
+  req.session.user.password = user.password; //세션 업데이트. 이거 안해도 되긴되던데?뭐지
+  return res.redirect("/users/logout");
+};
+
 export const logout = (req, res) => {
   req.session.destroy();
   return res.redirect("/");
