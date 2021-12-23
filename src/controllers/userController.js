@@ -142,9 +142,10 @@ export const getEdit = (req, res) => {
 export const postEdit = async (req, res) => {
   const {
     session: {
-      user: { _id },
+      user: { _id, avatarUrl },
     }, // const i = req.session.user.id 와 같음.
     body: { email, username, name, location }, // const { email, username, name, location } = req.body;와 같음
+    file,
   } = req;
   const exists = await User.exists({
     _id: { $ne: { _id } },
@@ -161,6 +162,7 @@ export const postEdit = async (req, res) => {
     {
       //현재 로그인된 user의 id는 request object에서 얻을 수 있다.
       //email 등의 변수는 form에서 가져오는 것이다.
+      avatarUrl: file ? file.path : avatarUrl,
       email,
       username,
       name,

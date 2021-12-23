@@ -22,3 +22,7 @@ export const publicOnlyMiddleware = (req, res, next) => {
     return res.redirect("/");
   }
 };
+
+export const express = require("express");
+export const multer = require("multer");
+export const uploadFiles = multer({ dest: "uploads/" });
