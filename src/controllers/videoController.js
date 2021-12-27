@@ -28,6 +28,7 @@ export const watch = async (req, res) => {
     //Video === null은 !Video와 같다.
     return res.status(404).render("404", { pageTitle: "Video not found" });
   } else {
+    console.error();
     return res.render("watch", { pageTitle: Video.title, video: Video }); //video: video가 같은 이름이면 video만 입력해도 됨.
   }
 };
@@ -60,15 +61,18 @@ export const getUpload = (req, res) => {
   return res.render("upload", { pageTitle: `upload Video` });
 };
 export const postUpload = async (req, res) => {
+  const file = req.file;
   const { title, description, hashtags } = req.body;
   try {
     await video.create({
       title,
       description,
+      fileUrl: file.path,
       hashtags: video.formatHashtags(hashtags),
     });
     return res.redirect("/");
   } catch (error) {
+    console.log(error);
     return res.status(400).render("upload", {
       pageTitle: `upload Video`,
       errorMessage: error._message,
