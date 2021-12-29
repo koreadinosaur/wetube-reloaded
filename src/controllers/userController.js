@@ -2,6 +2,7 @@ import User from "../models/User";
 import fetch from "node-fetch";
 import bcrypt from "bcrypt";
 import req from "express/lib/request";
+import video from "../models/video";
 
 //globalRouter
 export const getJoin = (req, res) => res.render("join", { pageTitle: "Join" });
@@ -137,7 +138,9 @@ export const finishGithubLogin = async (req, res) => {
 
 //userRouter
 export const getEdit = (req, res) => {
-  return res.render("edit-profile", { pageTitle: "Edit Profile" });
+  return res.render("edit-profile", {
+    pageTitle: "Edit Profile",
+  });
 };
 export const postEdit = async (req, res) => {
   const {
@@ -219,4 +222,16 @@ export const logout = (req, res) => {
   req.session.destroy();
   return res.redirect("/");
 };
-export const see = (req, res) => res.send("see");
+export const see = async (req, res) => {
+  const { id } = req.params;
+  const user = await User.findById(id);
+  const Video = await video.findById(id);
+  if (!user) {
+    return res.status(404).render("404", { pageTitle: "User is not found" });
+  }
+  return res.render("users/profile", {
+    pageTitle: `${user.name}'s profile`,
+    user,
+    video: Video,
+  });
+};

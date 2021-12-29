@@ -14,7 +14,7 @@ import {
   protectorMiddleware,
   publicOnlyMiddleware,
   uploadFiles,
-} from "../middlewares";
+} from "../middlewares.js";
 
 const userRouter = express.Router();
 

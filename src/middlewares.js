@@ -1,7 +1,7 @@
 export const localsMiddleware = (req, res, next) => {
   res.locals.loggedIn = Boolean(req.session.loggedIn);
   res.locals.siteName = "Wetube";
-  res.locals.loggedInUser = req.session.user;
+  res.locals.loggedInUser = req.session.user || {};
   next();
 };
 
@@ -26,13 +26,13 @@ export const publicOnlyMiddleware = (req, res, next) => {
 export const express = require("express");
 export const multer = require("multer");
 export const uploadFiles = multer({
-  dest: "uploads/profileUpload/",
+  dest: "uploads/profileupload/",
   limits: {
     fileSize: 3000000,
   },
 });
 export const uploadVideo = multer({
-  dest: "uploads/videoUpload/",
+  dest: "uploads/videoupload/",
   limits: {
     fileSize: 10000000,
   },

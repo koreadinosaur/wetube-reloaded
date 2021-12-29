@@ -1,5 +1,5 @@
 import video from "../models/video"; //video는 model, 후술할 Video는 objcet
-
+import User from "../models/User";
 //globalRouter
 export const home = async (req, res) => {
   const videos = await video.find({}).sort({ createdAt: "asc" }); //모든 video를 찾아냄 videos는 video들로 구성된 array다.
@@ -24,12 +24,13 @@ export const watch = async (req, res) => {
   const Video = await video.findById(id); //findById에서 필요한 id는 req.params에서 찾아온다.
   //video.findById(id).exec()입력하면 mongoose 내부적으로 promise가 return된다. 하지만 async랑 await을 쓰고 있기 떄문에
   // exec()를 입력할 필요는 없다. 입력해도 똑같이 작동함.
+  const owner = await User.findById(Video.owner);
   if (Video === null) {
     //Video === null은 !Video와 같다.
     return res.status(404).render("404", { pageTitle: "Video not found" });
   } else {
     console.error();
-    return res.render("watch", { pageTitle: Video.title, video: Video }); //video: video가 같은 이름이면 video만 입력해도 됨.
+    return res.render("watch", { pageTitle: Video.title, video: Video, owner }); //video: video가 같은 이름이면 video만 입력해도 됨.
   }
 };
 export const getEdit = async (req, res) => {
@@ -61,6 +62,9 @@ export const getUpload = (req, res) => {
   return res.render("upload", { pageTitle: `upload Video` });
 };
 export const postUpload = async (req, res) => {
+  const {
+    user: { _id },
+  } = req.session;
   const file = req.file;
   const { title, description, hashtags } = req.body;
   try {
@@ -68,6 +72,7 @@ export const postUpload = async (req, res) => {
       title,
       description,
       fileUrl: file.path,
+      owner: _id,
       hashtags: video.formatHashtags(hashtags),
     });
     return res.redirect("/");
