@@ -229,9 +229,12 @@ export const see = async (req, res) => {
   if (!user) {
     return res.status(404).render("404", { pageTitle: "User is not found" });
   }
+  const videos = await video.find({ owner: user._id });
+  console.log(videos);
   return res.render("users/profile", {
     pageTitle: `${user.name}'s profile`,
     user,
     video: Video,
+    videos,
   });
 };

@@ -21,16 +21,15 @@ export const search = async (req, res) => {
 //videoRouter
 export const watch = async (req, res) => {
   const { id } = req.params; //router가 주는 express기능인 것만 알면 됨.
-  const Video = await video.findById(id); //findById에서 필요한 id는 req.params에서 찾아온다.
+  const Video = await video.findById(id).populate("owner"); //findById에서 필요한 id는 req.params에서 찾아온다.
   //video.findById(id).exec()입력하면 mongoose 내부적으로 promise가 return된다. 하지만 async랑 await을 쓰고 있기 떄문에
   // exec()를 입력할 필요는 없다. 입력해도 똑같이 작동함.
-  const owner = await User.findById(Video.owner);
   if (Video === null) {
     //Video === null은 !Video와 같다.
     return res.status(404).render("404", { pageTitle: "Video not found" });
   } else {
     console.error();
-    return res.render("watch", { pageTitle: Video.title, video: Video, owner }); //video: video가 같은 이름이면 video만 입력해도 됨.
+    return res.render("watch", { pageTitle: Video.title, video: Video }); //video: video가 같은 이름이면 video만 입력해도 됨.
   }
 };
 export const getEdit = async (req, res) => {
