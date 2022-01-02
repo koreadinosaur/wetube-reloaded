@@ -34,10 +34,16 @@ export const watch = async (req, res) => {
 };
 export const getEdit = async (req, res) => {
   const { id } = req.params;
+  const {
+    user: { _id },
+  } = req.session;
   const Video = await video.findById(id);
   if (Video === null) {
     //Video === null은 !Video와 같다.
     return res.render("404", { pageTitle: "Video not found" });
+  }
+  if (String(Video.owner) !== _id) {
+    return res.status(403).redirect("/");
   }
   return res.render("edit", { pageTitle: `Edit ${Video.title}`, video: Video });
 };
@@ -45,7 +51,13 @@ export const getEdit = async (req, res) => {
 export const postEdit = async (req, res) => {
   const { id } = req.params;
   const { title, description, hashtags } = req.body;
+  const {
+    user: { _id },
+  } = req.session;
   const Video = await video.exists({ _id: id });
+  if (String(Video.owner) !== _id) {
+    return res.status(403).redirect("/");
+  }
   if (Video === null) {
     //Video === null은 !Video와 같다.
     return res.render("404", { pageTitle: "Video not found" });
@@ -67,13 +79,16 @@ export const postUpload = async (req, res) => {
   const file = req.file;
   const { title, description, hashtags } = req.body;
   try {
-    await video.create({
+    const newVideo = await video.create({
       title,
       description,
       fileUrl: file.path,
       owner: _id,
       hashtags: video.formatHashtags(hashtags),
     });
+    const user = await User.findById(_id);
+    user.videos.push(newVideo._id);
+    user.save();
     return res.redirect("/");
   } catch (error) {
     console.log(error);
@@ -87,5 +102,15 @@ export const postUpload = async (req, res) => {
 export const deleteVideo = async (req, res) => {
   const { id } = req.params;
   await video.findByIdAndDelete(id);
+  const {
+    user: { _id },
+  } = req.session;
+  const Video = await video.findById(id);
+  if (!Video) {
+    return res.status(404).render("404", { pageTitle: "Video not found" });
+  }
+  if (String(Video.owner) !== _id) {
+    return res.status(403).redirect("/");
+  }
   return res.redirect("/");
 };
