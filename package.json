@@ -8,7 +8,7 @@
     "url": "git+https://github.com/koreadinosaur/wetube-reloaded.git"
   },
   "scripts": {
-    "dev": "nodemon --exec babel-node src/init.js",
+    "dev": "nodemon",
     "assets": "webpack --config webpack.config.js"
   },
   "author": "khj",
@@ -35,6 +35,7 @@
     "@babel/preset-env": "^7.16.0",
     "babel-loader": "^8.2.3",
     "css-loader": "^6.5.1",
+    "mini-css-extract-plugin": "^2.5.2",
     "nodemon": "^2.0.14",
     "sass": "^1.48.0",
     "sass-loader": "^12.4.0",
