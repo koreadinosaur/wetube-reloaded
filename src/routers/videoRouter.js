@@ -24,6 +24,12 @@ videoRouter
   .route("/upload")
   .all(protectorMiddleware)
   .get(getUpload)
-  .post(uploadVideo.single("video"), postUpload); //videoRouter.get("/:id(\\d+)", watch); 이녀석보다 위에 있어야함. 아니면 id로 인식된다.
+  .post(
+    uploadVideo.fields([
+      { name: "video", maxCount: 1 },
+      { name: "thumb", maxCount: 1 },
+    ]),
+    postUpload
+  ); //videoRouter.get("/:id(\\d+)", watch); 이녀석보다 위에 있어야함. 아니면 id로 인식된다.
 
 export default videoRouter;
