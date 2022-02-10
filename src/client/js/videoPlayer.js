@@ -11,6 +11,7 @@ const videoControls = document.getElementById("videoControls");
 const playBtnIcon = playBtn.querySelector("i");
 const muteBtnIcon = muteBtn.querySelector("i");
 const fullScreenIcon = fullScreenBtn.querySelector("i");
+const ytdVideoformat = document.getElementById("ytd-video-format");
 
 let controlsTimeout = null;
 let controlsMovementTimeout = null;
@@ -141,12 +142,26 @@ const handleMouseLeave = () => {
   controlsTimeout = setTimeout(hideControls, 3000);
 };
 
+const handleEnded = () => {
+  const { id } = videoContainer.dataset;
+  fetch(`/api/videos/${id}/view`, {
+    method: "POST",
+  });
+};
+const ytdformat = () => {
+  const { ytd } = ytdVideoformat.dataset;
+  console.log(ytd);
+  ytdVideoformat.innerText = `업로드 날짜: ${ytd.substring(0, 10)}`;
+};
+ytdformat();
+
 video.addEventListener("click", handlePlayClick);
 playBtn.addEventListener("click", handlePlayClick);
 muteBtn.addEventListener("click", handleMute);
 volumeRange.addEventListener("input", handleVolumeChange);
 video.addEventListener("loadedmetadata", handleLoadedMetadata);
 video.addEventListener("timeupdate", handleTimeUpdate);
+video.addEventListener("ended", handleEnded);
 timeline.addEventListener("input", handleTimlineSet);
 timeline.addEventListener("change", handleTimelineChange);
 fullScreenBtn.addEventListener("click", handleFullscreen);

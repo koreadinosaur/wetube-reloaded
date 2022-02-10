@@ -1,14 +1,14 @@
 extends base.pug
 
 block content
-    div#videoContainer
+    div#videoContainer(data-Id=video._id)
         video(src=`/${video.fileUrl}`)
         div#videoControls.videoControls
             div.videoControls__play
                 span#play.videoControls__playBtn
                     i.fas.fa-play
                 div.videoControls__time
-                    span#currenTime 00:00
+                    span#currentTime 00:00
                     span  / 
                     span#totalTime 00:00
             input(type="range",step="1", value="0", min="0")#timeline.videoControls__timeline
@@ -18,19 +18,20 @@ block content
                     i.fas.fa-volume-up
                 span#fullScreen
                     i.fas.fa-expand               
+    div
+        p Title: #{video.title}
+        p Description: #{video.description}
+        small#ytd-video-format(data-ytd=video.createdAt)
+    div 
+        small Uploaded By 
+        a(href=`/users/${video.owner._id}`) #{video.owner.name}
+    if String(video.owner._id) === String(loggedInUser._id)
+        a(href=`${video.id}/edit`) Edit Video &rarr;
+        br
+        a(href=`${video.id}/delete`) Delete Video &rarr;
 
 
     //-
-        div
-            p=video.description
-            small=video.createdAt
-        div 
-            small Uploaded By 
-            a(href=`/users/${video.owner._id}`) #{video.owner.name}
-        if String(video.owner._id) === String(loggedInUser._id)
-            a(href=`${video.id}/edit`) Edit Video &rarr;
-            br
-            a(href=`${video.id}/delete`) Delete Video &rarr;
     
     
 block scripts 

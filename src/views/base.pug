@@ -1,9 +1,15 @@
+include mixins/message
+
 doctype html 
 html(lang="ko")
     head 
         title #{pageTitle} | Wetube
         include partials/head.pug
     body 
+        if messages.error 
+            +message("error", messages.error)
+        if messages.info 
+            +message("info", messages.info)       
         header 
             include partials/header.pug        
         main
