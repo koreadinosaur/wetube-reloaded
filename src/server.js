@@ -16,6 +16,7 @@ app.use(morganLogger);
 app.set("view engine", "pug");
 app.set("views", process.cwd() + "/src/views");
 app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
 
 app.use((req, res, next) => {
   res.header("Cross-Origin-Embedder-Policy", "require-corp");

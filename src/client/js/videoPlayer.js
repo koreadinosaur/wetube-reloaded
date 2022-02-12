@@ -11,7 +11,6 @@ const videoControls = document.getElementById("videoControls");
 const playBtnIcon = playBtn.querySelector("i");
 const muteBtnIcon = muteBtn.querySelector("i");
 const fullScreenIcon = fullScreenBtn.querySelector("i");
-const ytdVideoformat = document.getElementById("ytd-video-format");
 
 let controlsTimeout = null;
 let controlsMovementTimeout = null;
@@ -148,12 +147,6 @@ const handleEnded = () => {
     method: "POST",
   });
 };
-const ytdformat = () => {
-  const { ytd } = ytdVideoformat.dataset;
-  console.log(ytd);
-  ytdVideoformat.innerText = `업로드 날짜: ${ytd.substring(0, 10)}`;
-};
-ytdformat();
 
 video.addEventListener("click", handlePlayClick);
 playBtn.addEventListener("click", handlePlayClick);

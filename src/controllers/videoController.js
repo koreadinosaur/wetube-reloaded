@@ -1,5 +1,6 @@
 import video from "../models/video"; //video는 model, 후술할 Video는 objcet
 import User from "../models/User";
+import Comment from "../models/Comment";
 //globalRouter
 export const home = async (req, res) => {
   const videos = await video.find({}).sort({ createdAt: "asc" }); //모든 video를 찾아냄 videos는 video들로 구성된 array다.
@@ -21,9 +22,10 @@ export const search = async (req, res) => {
 //videoRouter
 export const watch = async (req, res) => {
   const { id } = req.params; //router가 주는 express기능인 것만 알면 됨.
-  const Video = await video.findById(id).populate("owner"); //findById에서 필요한 id는 req.params에서 찾아온다.
+  const Video = await video.findById(id).populate("owner").populate("comments"); //findById에서 필요한 id는 req.params에서 찾아온다.
   //video.findById(id).exec()입력하면 mongoose 내부적으로 promise가 return된다. 하지만 async랑 await을 쓰고 있기 떄문에
   // exec()를 입력할 필요는 없다. 입력해도 똑같이 작동함.
+  console.log(Video);
   if (Video === null) {
     //Video === null은 !Video와 같다.
     return res.status(404).render("404", { pageTitle: "Video not found" });
@@ -130,4 +132,25 @@ export const registerView = async (req, res) => {
   Video.meta.views = Video.meta.views + 1;
   await Video.save();
   return res.sendStatus(200);
+};
+
+export const createComment = async (req, res) => {
+  const {
+    session: { user },
+    body: { text },
+    params: { id },
+  } = req;
+
+  const Video = await video.findById(id);
+  if (!Video) {
+    return res.sendStatus(404); //status code를 보내고, request를 끝냄. res.status는 request 안끝냄
+  }
+  const comment = await Comment.create({
+    text,
+    owner: user._id,
+    video: id,
+  });
+  Video.comments.push(comment._id);
+  Video.save();
+  return res.sendStatus(201); //created 라는 뜻
 };
