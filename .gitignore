@@ -1,0 +1,9 @@
+/node_modules
+
+#nomad coder study note
+studynote.md
+/assignment
+.env
+/uploads
+/assets
+/build
