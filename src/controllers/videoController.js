@@ -25,7 +25,6 @@ export const watch = async (req, res) => {
   const Video = await video.findById(id).populate("owner").populate("comments"); //findById에서 필요한 id는 req.params에서 찾아온다.
   //video.findById(id).exec()입력하면 mongoose 내부적으로 promise가 return된다. 하지만 async랑 await을 쓰고 있기 떄문에
   // exec()를 입력할 필요는 없다. 입력해도 똑같이 작동함.
-  console.log(Video);
   if (Video === null) {
     //Video === null은 !Video와 같다.
     return res.status(404).render("404", { pageTitle: "Video not found" });
@@ -152,5 +151,20 @@ export const createComment = async (req, res) => {
   });
   Video.comments.push(comment._id);
   Video.save();
-  return res.sendStatus(201); //created 라는 뜻
+  return res.status(201).json({ newCommentId: comment._id }); //상태코드 201은 created 라는 뜻
+};
+
+export const deleteComment = async (req, res) => {
+  const { id } = req.params;
+  const {
+    user: { _id },
+  } = req.session;
+  const comment = await Comment.findById(id);
+  if (String(comment.owner) !== _id) {
+    return res.status(403).redirect("/");
+  }
+  await Comment.findByIdAndDelete(id);
+  const Video = await video.findById(comment.video);
+
+  return res.sendStatus(200);
 };
