@@ -1,17 +1,20 @@
+import "regenerator-runtime";
 const videoContainer = document.getElementById("videoContainer");
 const form = document.getElementById("commentForm");
-const rmBtn = document.getElementById("removeBtn");
+const rmBtn = document.querySelector(".video__comment button");
 const commentId = document.getElementById("commentId");
 
 const addComment = (text, id) => {
   const videoComments = document.querySelector(".video__comments ul");
   const newComments = document.createElement("li");
+  newComments.id = "commentId";
   newComments.dataset.id = id;
   newComments.className = "video__comment";
   const icon = document.createElement("i");
   icon.className = "fas fa-comment";
   const span = document.createElement("span");
   const span2 = document.createElement("button");
+  span2.id = "removeBtn";
   span.innerText = `${text}`;
   span2.innerText = "❌";
   newComments.appendChild(icon);
@@ -23,8 +26,6 @@ const addComment = (text, id) => {
 const handleDelete = async (event) => {
   const deleteCommentId = commentId.dataset.id;
   const li = event.target.parentElement;
-  console.log(event.target.parentElement);
-  console.log(event.target.parentNode);
   li.remove();
   await fetch(`/api/videos/${deleteCommentId}/deleteComment`, {
     method: "DELETE",
@@ -56,6 +57,5 @@ const handleSubmit = async (event) => {
 
 if (form) {
   form.addEventListener("submit", handleSubmit);
+  rmBtn.addEventListener("click", handleDelete);
 }
-
-rmBtn.addEventListener("click", handleDelete);

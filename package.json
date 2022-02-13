@@ -8,8 +8,12 @@
     "url": "git+https://github.com/koreadinosaur/wetube-reloaded.git"
   },
   "scripts": {
+    "start": "node build/init.js",
+    "build": "npm run build:server && npm run build:assets",
     "build:server": "babel src -d build",
+    "build:assets": "webpack --mode=production",
     "dev": "nodemon",
+    "dev:assets": "webpack --mode=development -w",
     "assets": "webpack --config webpack.config.js"
   },
   "author": "khj",
