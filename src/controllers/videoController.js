@@ -82,16 +82,16 @@ export const postUpload = async (req, res) => {
   const {
     user: { _id },
   } = req.session;
-  console.log(req.files);
   const { thumb } = req.files;
   const Video = req.files.video;
   const { title, description, hashtags } = req.body;
+  const isheroku = process.env.NODE_ENV === "production";
   try {
     const newVideo = await video.create({
       title,
       description,
-      fileUrl: Video[0].location,
-      thumbUrl: thumb[0].location,
+      fileUrl: isheroku ? Video[0].location : Video[0].path,
+      thumbUrl: isheroku ? thumb[0].location : thumbUrl[0].path,
       owner: _id,
       hashtags: video.formatHashtags(hashtags),
     });
