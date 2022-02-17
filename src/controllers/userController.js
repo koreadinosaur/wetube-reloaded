@@ -198,6 +198,9 @@ export const postChangePassword = async (req, res) => {
     },
     body: { currentPassword, newPassword, passwordConfirmation },
   } = req;
+  const user = await User.findById(_id); // save 쓰려면 user를 정의해줘야함.
+  console.log(User);
+  console.log(user);
   const match = await bcrypt.compare(currentPassword, password); //앞에거는 form의 비밀번호, 뒤에는 로그인된 사용자의 password
   if (!match) {
     return res.status(400).render("change-password", {
@@ -212,10 +215,9 @@ export const postChangePassword = async (req, res) => {
       errorMessage: "New password do not match the confirmation",
     });
   }
-  const user = await User.findById(_id); // save 쓰려면 user를 정의해줘야함.
   user.password = newPassword;
-  await user.save(); //promise일지도 모르니 await 선언. pre save middleware를 작동시킨다. 새로운 비밀번호를 hash하기 위함.
   req.session.user.password = user.password; //세션 업데이트. 이거 안해도 되긴되던데?뭐지
+  await user.save(); //promise일지도 모르니 await 선언. pre save middleware를 작동시킨다. 새로운 비밀번호를 hash하기 위함.
   req.flash("info", "Password Updated");
   return res.redirect("/users/logout");
 };
